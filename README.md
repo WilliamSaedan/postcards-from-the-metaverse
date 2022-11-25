@@ -1,12 +1,14 @@
+
 # Postcards from the Metaverse
+
 A system for saving and navigating towards locations in an x3d environment for use in an extended metaverse.
 
 ## Design Implementation
 
   - Bookmarks stored in localStorage
-  
-  - Bookmark format:
-  
+
+### Bookmark Format
+
   ```
   {
     "id": num,
