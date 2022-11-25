@@ -1,0 +1,497 @@
+<html>
+
+<head>
+	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="chrome=1,IE=edge">
+
+	<title>Metaverse</title>
+	<meta name="description" content="Metaverse castle demo">
+
+	<script type="text/javascript" src="./x3dom.js"></script>
+	<link rel="stylesheet" type="text/css" href="./Chaser_files/x3dom.css">
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.0.min.js"></script>
+	<!-- modified from url=(0066)https://andreasplesch.github.io/Library/Examples/gltf2/Chaser.html -->
+	<!-- npolys Web3D 2020 -->
+
+	<!--CSS-->
+	<link rel="stylesheet" href="css/main.css">
+
+	<!--Bootstrap import-->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+	<!--Other-->
+	<script src="https://kit.fontawesome.com/a863cde13f.js" crossorigin="anonymous"></script>
+	<script src="https://unpkg.com/vue@3"></script>
+	<script language="javascript" src="./Chaser_files/lz-string.min.js"></script>
+</head>
+
+<body class="bg-secondary">
+	<script>
+		// a usability recommendation: provide visual feedback for users about interaction modes   /// * esp Navigation!
+		// on load, report the current bound NavInfo type on screen in a DIV -> p 
+
+		//no jquery needed:
+ 
+		x3dom.runtime.ready = function showNav (){
+			var id = "x3d_scene";
+			var configure = document.getElementById(id);
+			
+			/* Default view */
+			configure.runtime.showAll();
+			var navigationTypeName = configure.runtime.navigationType();
+			// console.log(navigationTypeName);
+			document.getElementById('tip').innerHTML=navigationTypeName;
+
+			var url = new URL(window.location.href);
+			var location = url.searchParams.get('x') + " " + url.searchParams.get('y') + " " +  url.searchParams.get('z')
+			var orientation = url.searchParams.get('rx') + " " + url.searchParams.get('ry') + " " +  url.searchParams.get('rz') + " " +url.searchParams.get('w')
+			
+			var x3d = document.getElementById("x3d_scene").runtime;
+			var activeViewpoint = x3d.getActiveBindable('viewpoint');
+			if (!location.includes('null')) {
+				activeViewpoint.setAttribute('position',location);
+			}
+			if (!location.includes('null')) {
+				activeViewpoint.setAttribute('orientation',orientation);
+			}
+			x3d.resetView();
+		}
+
+
+		function clickedLeft(event){
+			document.getElementById('pc').setAttribute('destination', event.hitPnt);
+			document.getElementById('oc').setAttribute('destination', '0.86 0.36 -0.36 1.71');
+			document.getElementById('cc').setAttribute('destination', '1 0.1 0');
+		}
+
+		function clickedRight(event){
+			document.getElementById('pc').setAttribute('destination', event.hitPnt);
+			document.getElementById('oc').setAttribute('destination', '0.86 -0.36 0.36 1.71');
+			document.getElementById('cc').setAttribute('destination', '0.1 1 0');
+		}
+
+		function expand_tooltips() {
+			if ($('#tooltips').hasClass('d-none'))
+			{
+				$('#tooltips').removeClass("d-none")
+			}
+			else
+			{
+				$('#tooltips').addClass("d-none")
+			}
+		}
+
+		function openModal() {
+
+			$('#myModal').modal('show')
+
+		}
+
+		function saveNotes(){
+			
+			var textVal = $('#noteInput').val();
+			// console.log(textVal);
+			document.getElementById("firstNote").innerHTML = textVal;
+			document.getElementById('noteInput').value = "";
+			$('#myModal').modal('hide');
+
+		}
+
+		function renderPostcard(postcard) {
+			var carousel = document.getElementById('carousel-list');
+			
+			var container = document.createElement('div');
+			container.classList.add('col-lg-4');
+
+			var card = document.createElement('div');
+			card.classList.add('card');
+
+			var image = document.createElement('img');
+			image.setAttribute('src', postcard.thumbnail);
+			image.setAttribute('alt', postcard.title);
+			image.classList.add('card-img-top');
+
+			var cardBody = document.createElement('div');
+			cardBody.classList.add('card-body');
+
+			var cardTitle = document.createElement('h5');
+			cardTitle.classList.add('card-title');
+			cardTitle.innerHTML = postcard.title;
+
+			var cardText = document.createElement('p');
+			cardText.classList.add('card-text');
+			cardText.innerHTML = postcard.description;
+
+			var navButton = document.createElement('div');
+			navButton.classList.add('text-center');
+
+			var navLink = document.createElement('a');
+			navLink.classList.add('btn');
+			navLink.classList.add('btn-primary');
+			navLink.setAttribute('href', postcard.link);
+			navLink.innerHTML = 'Go to Location';
+
+			navButton.appendChild(navLink);
+
+			cardBody.appendChild(cardTitle);
+			cardBody.appendChild(cardText);
+			cardBody.appendChild(navButton);
+
+			card.appendChild(image);
+			card.appendChild(cardBody);
+			
+			container.appendChild(card);
+
+			carousel.appendChild(container);
+		}
+		
+		function updateCarousel(postcards) { 
+			var carousel = document.getElementById('carousel-list');
+			carousel.innerHTML = "";
+			for (let postcard of postcards){
+				renderPostcard(postcard);
+			}
+		}
+		
+		//////////////////////////////////
+		
+		///   using jquery : 
+		
+		$(document).ready(function(){
+			var postcards = localStorage.getItem('postcards');
+			postcards = postcards ? JSON.parse(LZString.decompressFromUTF16(postcards)) : [];
+			console.log(postcards);
+			updateCarousel(postcards);
+			var screenshotCount = 0;
+
+			//Every time the user clicks on the 'take screenhot' button
+			var makePostcard = function () {
+				//Get data url from the runtime
+				var x3d = document.getElementById("x3d_scene").runtime;
+				
+				var sceneName = document.title
+				var imgUrl = x3d.getScreenshot();
+				var translation = new x3dom.fields.SFVec3f( 0, 0, 0 ),
+					scaleFactor = new x3dom.fields.SFVec3f( 1, 1, 1 );
+				var rotation = new x3dom.fields.Quaternion( 0, 0, 1, 0 ),
+					scaleOrientation = new x3dom.fields.Quaternion( 1, 1, 1, 1 );
+				x3d.viewMatrix().getTransform(translation, rotation, scaleFactor, scaleOrientation)
+				var description = document.querySelector('meta[name="description"]');;
+				var domDescription = document.querySelector('meta[name="description"]');
+				if (domDescription != null) {
+					description = domDescription.content
+				}
+				console.log(rotation.toString());
+				var metaLink = new URL(window.location.href);
+				metaLink.searchParams.set('x',-translation.x);
+				metaLink.searchParams.set('y',-translation.y);
+				metaLink.searchParams.set('z',-translation.z);
+				metaLink.searchParams.set('rx',-rotation.x);
+				metaLink.searchParams.set('ry',-rotation.y);
+				metaLink.searchParams.set('rz',-rotation.z);
+				metaLink.searchParams.set('w',1);
+
+				var postcards = localStorage.getItem('postcards');
+				postcards = postcards ? JSON.parse(LZString.decompressFromUTF16(postcards)) : [];
+				console.log(translation);
+				console.log(metaLink);
+				postcards.push({
+					id: postcards.length,
+					title: sceneName,
+					thumbnail: imgUrl,
+					location: translation,
+					orientation: rotation,
+					description: description,
+					link: metaLink.href
+				})
+				updateCarousel(postcards);
+				localStorage.setItem('postcards', LZString.compressToUTF16(JSON.stringify(postcards)));
+			};
+
+			$("#btnMakePostcard").on("click", makePostcard);
+
+			onAntiqueCamera = function (e) { 
+
+				if ( e.fieldName == 'bind' )
+				{
+					if ( !e.value )
+					{
+						makePostcard();
+					}
+					console.log (e, 'cam clicked'); };
+				}
+		});
+	</script>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	<a class="navbar-brand" href="#">Postcards From the Metaverse</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+	  <span class="navbar-toggler-icon"></span>
+	</button>
+	<div class="collapse navbar-collapse" id="navbarText">
+	  <ul class="navbar-nav mr-auto">
+		<li class="nav-item active">
+		  <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+		</li>
+	  </ul>
+	</div>
+	</div>
+	</span>
+	</div>
+	</nav>
+
+  <!--1209px, 691px-->
+
+  	<h1 class="text-center mt-4 mb-4 text-white">Currently Visiting: Castle</h1>
+
+  	<div class="row mx-0">
+
+		<div id="x3d-container" class="col-lg-8 offset-lg-1 px-0">
+
+			<x3d id="x3d_scene" showlog="false" height="550px" class="mw-100 mh-100">
+
+				<scene def="scene" render="true" visible="true" bboxcenter="0,0,0" bboxsize="-1,-1,-1" pickmode="idBuf"
+					dopickpass="true">
+					<navigationInfo type='"WALK","ANY"' transitiontime='0' headlight-'true'></navigationInfo>
+					<environment SSAO='"true"' ></environment>
+					<viewpoint id='person' position="0 1.6 5" nearclippingplane="-1" farclippingplane="-1"
+						fieldofview="0.785398" orientation="0,0,0,0" centerofrotation="0,0,0" znear="-1" zfar="-1"></viewpoint>
+					<!--<spotlight direction='0 -1 0'  location='0 3 0' shadowIntensity='1'  shadowCascades="1" shadowFilterSize="16" shadowMapSize="1024" ></spotlight>-->
+					<directionallight shadowIntensity='0' direction='0 -1 0' on="TRUE" intensity='1.0'></directionallight>
+					
+					<transform translation ='-3 6 0' rotation='0 0 1 .785'>
+								<shape>
+					<appearance>
+					<material ambientintensity='1' diffuseColor='1 1 1' emissivecolor='1 1 1'></material>
+					</appearance>
+					<cone height='.1' bottomRadius='.1'></cone>
+					</shape>
+					</transform>
+					<spotlight znear='0.5' zfar='1000' direction='0.5 -1 0'  location='-3 6 0' shadowIntensity='0.5'  shadowCascades="4" shadowMapSize="2048" ></spotlight>
+		
+					<background groundcolor="0.11, 0.43, 0.027" skycolor="0.74 0.84 0.96" groundangle="" skyangle="" backurl=""
+						bottomurl="" fronturl="" lefturl="" righturl="" topurl=""></background>
+		
+					<transform rotation='0 1 0 1.578' scale='2 2 2'>
+						<inline url="&quot;./Sponza/glTF/Sponza.gltf&quot;" render="true" visible="true" bboxcenter="0,0,0"
+							bboxsize="-1,-1,-1" load="true" namespacename="">
+						</inline>
+					</transform>
+		
+					<pointlight  shadowIntensity='0.5'  shadowCascades="4" shadowMapSize="2048" DEF='pl' intensity='0' location='0 3 1' radius='300'></pointlight>
+					<transform translation='0 3 1'>
+					<shape>
+					<appearance>
+					<material ambientintensity='1' diffuseColor='1 1 1' emissivecolor='1 1 1'></material>
+					</appearance>
+					<sphere radius='.1'></sphere>
+					</shape>
+					
+					</transform>
+					
+					<scalarinterpolator DEF='si' key='0 .2 .3 1' keyValue='0, 0.9, 1, 0'></scalarinterpolator>
+					<timesensor DEF='ts' cycleInterval='1'></timesensor>
+		
+		
+					<transform translation='0 1.4 0' scale='.5 .5 .5'>
+		
+						<transform def="marker" render="true" visible="true" bboxcenter="0,0,0" bboxsize="-1,-1,-1"
+							center="0,0,0" translation="0,0,0" rotation="0,0,0,0" scale="1,1,1" scaleorientation="0,0,0,0">
+		
+							<transform rotation='1 0 0 -1.578'>
+								<transform rotation="0 1 0 0" translation="0 0 1.8" render="true">
+									<transform rotation="0 1 0 3.14" scale=".5 .5 .5" translation="0 -4 0">
+										<touchsensor DEF='touch'></touchsensor>
+										<inline id="cameraInline" url="&quot;./AntiqueCamera/glTF/AntiqueCamera.gltf&quot;"
+											render="true" visible="true" load="true" namespacename="cam">
+										</inline>
+									</transform>
+									<viewpoint position='0 -1 1' def="aCamera" zNear='1.55' fieldOfView='1' 
+										onoutputchange='onAntiqueCamera(event)' _onviewpointchanged='onAntiqueCamera(event)'>
+									</viewpoint>
+								</transform>
+								<!--
+				  <transform scale="0.1 0.1 0.1" translation="0 -.1 0" rotation="1 0 0 -1.578" render="true" visible="true" bboxcenter="0,0,0" bboxsize="-1,-1,-1" center="0,0,0" scaleorientation="0,0,0,0">
+					<shape render="true" visible="true" bboxcenter="0,0,0" bboxsize="-1,-1,-1" ispickable="true">
+						<appearance sorttype="auto" alphaclipthreshold="0.1">
+							<material id="mat" diffusecolor="yellow" ambientintensity="0.2" emissivecolor="0,0,0" shininess="0.2" specularcolor="0,0,0"></material>
+						</appearance>
+						<cone solid="false" ccw="true" usegeocache="true" lit="true" bottomradius="1" height="2" bottom="true" side="true" top="true" subdivision="32"></cone>
+					</shape>
+					</transform>    -->
+							</transform>
+						</transform>
+		
+						<positionchaser id="pc" duration="1.0" initialdestination="0 -1 0" initialvalue="0 0 0" value="0,0,0"
+							destination="0,0,0">
+						</positionchaser>
+						<orientationchaser id="oc" duration="1.0" initialdestination="0 0 1 0" initialvalue="0 0 1 0.75"
+							value="0,0,0,0" destination="0,0,0,0">
+						</orientationchaser>
+						<colorchaser id="cc" duration="1.5" initialdestination="1 1 0" initialvalue="1 1 0" value="0,0,0"
+							destination="0,0,0">
+						</colorchaser>
+		
+						<route fromnode="pc" fromfield="value_changed" tonode="marker" tofield="translation"></route>
+						<route fromnode="oc" fromfield="value_changed" tonode="marker" tofield="rotation"></route>
+						<!--  <route fromnode="cc" fromfield="value_changed" tonode="mat" tofield="diffuseColor"></route> -->
+		
+						<route fromnode="touch" fromfield="touchTime" tonode="ts" tofield="startTime"></route>
+						<route fromnode="ts" fromfield="isActive" tonode='aCamera' tofield='bind'></route>
+		
+						<route fromnode="ts" fromfield="fraction_changed" tonode="si" tofield="set_fraction"></route>
+						<route fromnode="si" fromfield="value_changed" tonode="pl" tofield="intensity"></route>
+		
+		
+		
+						<transform onmousemove="clickedLeft(event);" rotation="0 1 0 0.785" translation="-1 0 0" render="true"
+							visible="true" bboxcenter="0,0,0" bboxsize="-1,-1,-1" center="0,0,0" scale="1,1,1"
+							scaleorientation="0,0,0,0">
+							<shape render="true" visible="true" bboxcenter="0,0,0" bboxsize="-1,-1,-1" ispickable="true">
+								<appearance sorttype="auto" alphaclipthreshold="0.1">
+									<imagetexture url='a.png'></imagetexture>
+									<material diffusecolor="red" ambientintensity="0.2" emissivecolor="0,0,0" shininess="0.2"
+										specularcolor="0,0,0"></material>
+								</appearance>
+								<indexedfaceset def="plane" solid="false" creaseangle="3" coordindex="2 0 3 -1 3 0 1 -1"
+									ccw="true" usegeocache="true" lit="true" colorpervertex="true" normalpervertex="true"
+									normalupdatemode="fast" convex="true" normalindex="" colorindex="" texcoordindex="">
+									<coordinate point="-1 -1 0 1 -1 0 -1 1 0 1 1 0"></coordinate>
+									<normal vector="0 0 1 0 0 1 0 0 1 0 0 1"></normal>
+								</indexedfaceset>
+							</shape>
+						</transform>
+		
+						<transform onmousemove="clickedRight(event);" rotation="0 1 0 -0.785" translation="1 0 0" render="true"
+							visible="true" bboxcenter="0,0,0" bboxsize="-1,-1,-1" center="0,0,0" scale="1,1,1"
+							scaleorientation="0,0,0,0">
+							<shape render="true" visible="true" bboxcenter="0,0,0" bboxsize="-1,-1,-1" ispickable="true">
+								<appearance sorttype="auto" alphaclipthreshold="0.1">
+									<imagetexture url='b.jpg'></imagetexture>
+									<material diffusecolor="green" ambientintensity="0.2" emissivecolor="0,0,0" shininess="0.2"
+										specularcolor="0,0,0"></material>
+								</appearance>
+								<indexedfaceset use="plane">
+								</indexedfaceset>
+							</shape>
+						</transform>
+					</transform>
+				</scene>
+			</x3d>
+
+
+		</div>
+
+		<div id="options-container" class="col-lg-2 ml-3" style="max-height: 550px">
+
+			<button class="btn btn-primary btn-lg btn-block mt-3"><a class="text-white"href="#" id="btnMakePostcard">Make a Postcard</a></button>
+			<button class="btn btn-success btn-lg btn-block">View gallery</button>
+			
+			<h3 class="mt-3 text-center position-relative">Information <i style="cursor: pointer;" class="fa fa-question-circle fa-icons" onclick="expand_tooltips()"></i></h3>
+
+			<div id="tooltips" class="bg-light px-1 mt-2">
+
+				<p>Navigation Mode: <span id="tip" class="text-success"></span></p>
+				
+				<p>Here is an X3D scene with glTF assets. </p>
+
+				<p>Click the Antique Camera to take a picture</p>
+
+				<p>Images are displayed and available for download below.</p>
+
+				<p>X3D4 Demo: Nicholas Polys & Andreas Plesch</p>
+
+			</div>
+			
+
+
+		</div>
+		  
+
+	</div> <!--End of row-->
+
+	<h1 class="mt-5 mb-4 text-center text-white">Postcards</h1>
+
+	<div class="row mx-0 mb-5">
+
+		<div class="col-lg-10 offset-lg-1">
+
+			<div id="carouselExampleControls" class="carousel slide" data-ride="carousel" data-interval="100000">
+				<div class="carousel-inner">
+
+				  <div class="carousel-item active">
+					<div class="container">
+						<div id="carousel-list" class="row">
+						</div>
+					</div>
+				  </div>
+
+				<a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+				  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				  <span class="sr-only">Previous</span>
+				</a>
+				<a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+				  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+				  <span class="sr-only">Next</span>
+				</a>
+			</div>
+
+		</div> <!--End of gallery col-->
+
+	</div> <!--End of gallery row-->
+
+	<div class="modal" tabindex="-1" role="dialog" id="myModal">
+		<div class="modal-dialog" role="document">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Screenshot Note</h5>
+			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			  </button>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<label for="exampleFormControlTextarea1"></label>
+					<textarea class="form-control" id="noteInput" rows="3"></textarea>
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			  <button type="button" class="btn btn-primary" onclick="saveNotes()">Save changes</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+
+
+	<div class="d-none"id='HUDs_Div'
+		style='margin:2px; padding:4px 150px 4px 4px; background-color:rgba(199,202,204,.7); position:absolute; z-index:1000; right:0px; top:50px;'>
+		<div id='X3DOM_AOPT_Links'>
+			<h3>Your Navigation Mode is: </h3>
+			<p id='tip'></p>
+			Here is an X3D scene with glTF assets Inlined, lit and shadowed. 
+		</div>
+
+		<div>
+			<center>Use the DOM to capture your X3D! 
+				<br> <a href="#" id="btnMakePostcard">Make a Postcard</a> -OR-
+				<br> <em>Click the Antique Camera to take a picture. </em><br>
+				Images are displayed and available for download below.
+			</center>
+		</div>
+
+	</div>
+
+	<div class="d-none"style="position:absolute;left:0px;border:1px solid #dddddd; width:300px;min-height:200px;padding:10px;">
+		<b>Screenshots: <span id="screenshotCount">0</span></b>
+	<div id="screenshotPreviews">
+
+<br>
+</body>
+
+</html>
